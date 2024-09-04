@@ -35,20 +35,15 @@ import (
 
 var (
 	// flags
-	logger          *log.Logger
-	verbose         bool
-	displayProtocol string
-	aspectRatio     string
-	outputFormat    string
-	outputFolder    string
-	apiToken        string
-	fluxModel       string
-	prompt          string
+	logger       *log.Logger
+	verbose      bool
+	aspectRatio  string
+	outputFormat string
+	outputFolder string
+	apiToken     string
+	fluxModel    string
+	prompt       string
 	// choices
-	validDisplayProtocols = []string{
-		"kitty",
-		"iterm",
-	}
 	validOutputFormats = []string{
 		"png",
 		"webp",
@@ -91,23 +86,18 @@ var rootCmd = &cobra.Command{
 			logger.Error(fmt.Sprintf("Invalid output format (must be one of: %s)", strings.Join(validOutputFormats, ", ")), "format", outputFormat)
 			os.Exit(1)
 		}
-		if !slices.Contains(validDisplayProtocols, displayProtocol) {
-			logger.Error(fmt.Sprintf("Invalid display protocol (must be one of: %s)", strings.Join(validDisplayProtocols, ", ")), "display", displayProtocol)
-			os.Exit(1)
-		}
 		if !slices.Contains(validFluxModels, fluxModel) {
 			logger.Error(fmt.Sprintf("Invalid flux model (must be one of: %s)", strings.Join(validFluxModels, ", ")), "model", fluxModel)
 			os.Exit(1)
 		}
 		// run
 		p := tea.NewProgram(initialModel(&config{
-			Prompt:          prompt,
-			ApiToken:        apiToken,
-			DisplayProtocol: displayProtocol,
-			AspectRatio:     aspectRatio,
-			OutputFormat:    outputFormat,
-			OutputFolder:    outputFolder,
-			FluxModel:       fluxModel,
+			Prompt:       prompt,
+			ApiToken:     apiToken,
+			AspectRatio:  aspectRatio,
+			OutputFormat: outputFormat,
+			OutputFolder: outputFolder,
+			FluxModel:    fluxModel,
 		}), tea.WithAltScreen())
 		m, err := p.Run()
 		if err != nil {
@@ -148,7 +138,6 @@ func init() {
 
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "V", false, "Verbose output")
 	rootCmd.Flags().StringVarP(&prompt, "prompt", "p", "", "Prompt for image generation")
-	rootCmd.Flags().StringVarP(&displayProtocol, "display", "d", "kitty", "Terminal graphics protocol to use (kitty or iterm)")
 	rootCmd.Flags().StringVarP(&aspectRatio, "aspect", "a", "1:1", "Aspect ratio of the image (16:9, 4:3, 1:1, etc)")
 	rootCmd.Flags().StringVarP(&outputFormat, "format", "f", "png", "Output image format (png, webp, or jpg)")
 	rootCmd.Flags().StringVarP(&apiToken, "api-token", "t", "", "Replicate API token (overrides REPLICATE_API_KEY env_var)")

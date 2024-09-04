@@ -20,7 +20,9 @@
                 "${workspaceFolder}/main.go",
                 "--",
                 "--model",
-                "schnell"
+                "schnell",
+                "--output",
+                "${workspaceFolder}/test",
             ],
             "isBackground": true,
             "problemMatcher": {

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +12,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/blacktop/go-termimg"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -29,7 +29,7 @@ const (
 
 type model struct {
 	prompt       string
-	image        []byte
+	image        *termimg.TermImg
 	err          error
 	inputMode    bool
 	cursorPos    int
@@ -46,13 +46,12 @@ type model struct {
 }
 
 type config struct {
-	Prompt          string
-	ApiToken        string
-	FluxModel       string
-	DisplayProtocol string
-	AspectRatio     string
-	OutputFormat    string
-	OutputFolder    string
+	Prompt       string
+	ApiToken     string
+	FluxModel    string
+	AspectRatio  string
+	OutputFormat string
+	OutputFolder string
 }
 
 func initialModel(c *config) model {
@@ -136,7 +135,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case []byte:
-		m.image = msg
+		img, err := termimg.NewTermImg(bytes.NewReader(msg))
+		if err != nil {
+			m.err = err
+		}
+		m.image = img
 		m.generating = false
 		m.regenerating = false
 		return m, nil
@@ -168,7 +171,7 @@ func (m model) View() string {
 
 	mainView := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, rightPanel)
 
-	if m.generating && (len(m.image) == 0 || m.regenerating) {
+	if m.generating && (m.image == nil || m.regenerating) {
 		return lipgloss.NewStyle().MaxWidth(m.width).MaxHeight(m.height).Render(
 			lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, m.spinnerPopup(), lipgloss.WithWhitespaceChars("  "),
 				lipgloss.WithWhitespaceForeground(lipgloss.Color("0"))),
@@ -179,7 +182,7 @@ func (m model) View() string {
 }
 
 func (m model) spinnerPopup() string {
-	if !m.generating || (len(m.image) > 0 && !m.regenerating) {
+	if !m.generating || (m.image != nil && !m.regenerating) {
 		return ""
 	}
 
@@ -207,7 +210,7 @@ func (m model) leftPanelView(width int) string {
 	content := ""
 	if m.inputMode {
 		content = fmt.Sprintf("Enter prompt:\n\n%s", m.textInput.View())
-	} else if len(m.image) > 0 {
+	} else if m.image != nil {
 		downloadStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("86"))
 		regenerateStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("86"))
 
@@ -235,8 +238,8 @@ func (m model) rightPanelView(width int) string {
 		Width(width).
 		Height(m.height)
 
-	if len(m.image) > 0 && !m.regenerating {
-		cmd := m.displayImage(m.image)
+	if m.image != nil && !m.regenerating {
+		cmd, _ := m.displayImage()
 		m.viewport.SetContent(cmd)
 		centeredContent := lipgloss.Place(width, m.height,
 			lipgloss.Center, lipgloss.Center,
@@ -257,21 +260,8 @@ func (m model) rightPanelView(width int) string {
 	return placeholderStyle.Render("Image will be displayed here")
 }
 
-func (m model) displayImage(image []byte) string {
-	if m.config.DisplayProtocol == "kitty" {
-		return displayKittyImage(image)
-	}
-	return displayITermImage(image)
-}
-
-func displayKittyImage(image []byte) string {
-	encoded := base64.StdEncoding.EncodeToString(image)
-	return fmt.Sprintf("\033_Ga=T,f=100;%s\033\\", encoded)
-}
-
-func displayITermImage(image []byte) string {
-	encoded := base64.StdEncoding.EncodeToString(image)
-	return fmt.Sprintf("\033]1337;File=inline=1;size=%d;width=auto;height=auto:%s\a\n", len(image), encoded)
+func (m model) displayImage() (string, error) {
+	return m.image.Render()
 }
 
 func generateImage(prompt string, c *config) tea.Cmd {
@@ -398,7 +388,7 @@ func generateImage(prompt string, c *config) tea.Cmd {
 	}
 }
 
-func saveImage(image []byte, prompt string) (string, error) {
+func saveImage(image *termimg.TermImg, prompt string) (string, error) {
 	// Sanitize the prompt for use in a filename
 	sanitizedPrompt := strings.Map(func(r rune) rune {
 		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '-' || r == '_' {
@@ -419,8 +409,11 @@ func saveImage(image []byte, prompt string) (string, error) {
 		}
 		filename = filepath.Join(outputFolder, filename)
 	}
-	err := os.WriteFile(filename, image, 0644)
+	data, err := image.AsPNGBytes()
 	if err != nil {
+		return "", err
+	}
+	if err := os.WriteFile(filename, data, 0644); err != nil {
 		return "", fmt.Errorf("error saving image: %w", err)
 	}
 	fmt.Printf("Image saved: %s\n", filename)

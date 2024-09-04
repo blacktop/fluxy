@@ -13,3 +13,9 @@ build:
 release:
 	@echo "🚀 Releasing Version $(shell svu current)"
 	goreleaser build --id default --clean --snapshot --single-target --output dist/fluxy
+
+.PHONY: work-termimg
+work-termimg: ## Work on go-termimg package
+	@echo " > Working on go-termimg package"
+	@go work init
+	@go work use . ../go-termimg
