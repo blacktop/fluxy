@@ -35,7 +35,24 @@ Or download the latest [release](https://github.com/blacktop/fluxy/releases/late
       ```bash
       export REPLICATE_API_TOKEN=r8_**********************
       ```
-3) Exec `fluxy`
+3) exec `fluxy`
+
+```bash
+> fluxy --help
+
+FLUX image generator TUI
+
+Usage:
+  fluxy [flags]
+
+Flags:
+  -a, --aspect string    Aspect ratio of the image (example: 16:9, 4:3, 1:1) (default "1:1")
+  -d, --display string   Terminal graphics protocol to use (kitty or iterm) (default "kitty")
+  -f, --format string    Output image format (png, webp, or jpg) (default "png")
+  -h, --help             help for fluxy
+  -o, --output string    Output folder
+  -V, --verbose          Verbose output
+```
 
 ![demo](vhs.gif)
 
