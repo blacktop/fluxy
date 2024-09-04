@@ -46,12 +46,14 @@ Usage:
   fluxy [flags]
 
 Flags:
-  -a, --aspect string    Aspect ratio of the image (example: 16:9, 4:3, 1:1) (default "1:1")
-  -d, --display string   Terminal graphics protocol to use (kitty or iterm) (default "kitty")
-  -f, --format string    Output image format (png, webp, or jpg) (default "png")
-  -h, --help             help for fluxy
-  -o, --output string    Output folder
-  -V, --verbose          Verbose output
+  -t, --api-token string   Replicate API token (overrides REPLICATE_API_KEY env_var)
+  -a, --aspect string      Aspect ratio of the image (16:9, 4:3, 1:1, etc) (default "1:1")
+  -d, --display string     Terminal graphics protocol to use (kitty or iterm) (default "kitty")
+  -f, --format string      Output image format (png, webp, or jpg) (default "png")
+  -h, --help               help for fluxy
+  -m, --model string       Model to use (schnell, pro, or dev) (default "pro")
+  -o, --output string      Output folder
+  -V, --verbose            Verbose output
 ```
 
 ![demo](vhs.gif)
