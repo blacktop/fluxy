@@ -220,7 +220,10 @@ func (m model) rightPanelView(width int) string {
 	if len(m.image) > 0 && !m.regenerating {
 		cmd := m.displayImage(m.image)
 		m.viewport.SetContent(cmd)
-		return style.Render(m.viewport.View())
+		centeredContent := lipgloss.Place(width, m.height,
+			lipgloss.Center, lipgloss.Center,
+			m.viewport.View())
+		return style.Render(centeredContent)
 	}
 
 	placeholderStyle := lipgloss.NewStyle().
