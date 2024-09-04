@@ -16,7 +16,7 @@
 
 ## Why? 🤔
 
-<!-- Fill this out -->
+Why leave the terminal to capture an AI image generation idea?
 
 ## Getting Started
 
@@ -25,6 +25,15 @@
 ```bash
 go install github.com/blacktop/fluxy@latest
 ```
+
+### Run
+
+1) Sign up for an account at [Replicate](https://replicate.com)
+2) Place `API` key in **env**
+      ```bash
+      export REPLICATE_API_TOKEN=r8_N*********************
+      ```
+3) Exec `fluxy`
 
 <!-- Fill this out -->
 
