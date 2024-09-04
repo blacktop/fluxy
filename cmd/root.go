@@ -43,6 +43,7 @@ var (
 	outputFolder    string
 	apiToken        string
 	fluxModel       string
+	prompt          string
 	// choices
 	validDisplayProtocols = []string{
 		"kitty",
@@ -100,6 +101,7 @@ var rootCmd = &cobra.Command{
 		}
 		// run
 		p := tea.NewProgram(initialModel(&config{
+			Prompt:          prompt,
 			ApiToken:        apiToken,
 			DisplayProtocol: displayProtocol,
 			AspectRatio:     aspectRatio,
@@ -145,6 +147,7 @@ func init() {
 	logger.SetStyles(styles)
 
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "V", false, "Verbose output")
+	rootCmd.Flags().StringVarP(&prompt, "prompt", "p", "", "Prompt for image generation")
 	rootCmd.Flags().StringVarP(&displayProtocol, "display", "d", "kitty", "Terminal graphics protocol to use (kitty or iterm)")
 	rootCmd.Flags().StringVarP(&aspectRatio, "aspect", "a", "1:1", "Aspect ratio of the image (16:9, 4:3, 1:1, etc)")
 	rootCmd.Flags().StringVarP(&outputFormat, "format", "f", "png", "Output image format (png, webp, or jpg)")

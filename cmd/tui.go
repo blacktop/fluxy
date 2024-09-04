@@ -46,6 +46,7 @@ type model struct {
 }
 
 type config struct {
+	Prompt          string
 	ApiToken        string
 	FluxModel       string
 	DisplayProtocol string
@@ -63,17 +64,26 @@ func initialModel(c *config) model {
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
-	return model{
-		inputMode:  true,
+	m := model{
+		inputMode:  c.Prompt == "",
 		textInput:  ti,
 		viewport:   viewport.New(0, 0),
 		spinner:    s,
-		generating: false,
+		generating: c.Prompt != "",
 		config:     c,
 	}
+
+	if c.Prompt != "" {
+		m.prompt = c.Prompt
+	}
+
+	return m
 }
 
 func (m model) Init() tea.Cmd {
+	if m.generating {
+		return tea.Batch(generateImage(m.prompt, m.config), m.spinner.Tick)
+	}
 	return tea.Batch(textinput.Blink, m.spinner.Tick)
 }
 
@@ -367,8 +377,8 @@ func generateImage(prompt string, c *config) tea.Cmd {
 		var outputURL string
 		if url, ok := result.Output.(string); ok {
 			outputURL = url
-		} else if urls, ok := result.Output.([]string); ok {
-			outputURL = urls[0]
+		} else if urls, ok := result.Output.([]any); ok {
+			outputURL = urls[0].(string)
 		} else {
 			return fmt.Errorf("unexpected output type: %T", result.Output)
 		}

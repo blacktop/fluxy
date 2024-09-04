@@ -1,5 +1,10 @@
 {
     "version": "2.0.0",
+    "options": {
+        "env": {
+            "REPLICATE_API_TOKEN": "${env:REPLICATE_API_TOKEN}",
+        },
+    },
     "tasks": [
         {
             "label": "Run headless dlv",
@@ -14,8 +19,8 @@
                 "--api-version=2",
                 "${workspaceFolder}/main.go",
                 "--",
-                "--api-token",
-                "${env:REPLICATE_API_TOKEN}"
+                "--model",
+                "schnell"
             ],
             "isBackground": true,
             "problemMatcher": {
