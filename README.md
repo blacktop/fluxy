@@ -39,6 +39,10 @@ Or download the latest [release](https://github.com/blacktop/fluxy/releases/late
 
 ![demo](vhs.gif)
 
+> [!NOTE]  
+> The in terminal images leverage the **iTerm2** [Inline Images Protocol](https://iterm2.com/documentation-images.html) and the Kitty [Terminal Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/).
+> You must use a compatible terminal to view these images.
+
 ## License
 
 MIT Copyright (c) <YEAR> **blacktop**
