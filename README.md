@@ -31,11 +31,9 @@ go install github.com/blacktop/fluxy@latest
 1) Sign up for an account at [Replicate](https://replicate.com)
 2) Place `API` key in **env**
       ```bash
-      export REPLICATE_API_TOKEN=r8_N*********************
+      export REPLICATE_API_TOKEN=r8_**********************
       ```
 3) Exec `fluxy`
-
-<!-- Fill this out -->
 
 ![demo](vhs.gif)
 
