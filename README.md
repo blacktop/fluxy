@@ -31,7 +31,7 @@ Or download the latest [release](https://github.com/blacktop/fluxy/releases/late
 ### Run
 
 1) Sign up for an account at [Replicate](https://replicate.com)
-2) Place `API` key in **env**
+2) Place `API_TOKEN` in **env**
       ```bash
       export REPLICATE_API_TOKEN=r8_**********************
       ```
