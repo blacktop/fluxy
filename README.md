@@ -26,6 +26,8 @@ Why leave the terminal to capture an AI image generation idea?
 go install github.com/blacktop/fluxy@latest
 ```
 
+Or download the latest [release](https://github.com/blacktop/fluxy/releases/latest)
+
 ### Run
 
 1) Sign up for an account at [Replicate](https://replicate.com)
