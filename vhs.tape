@@ -55,4 +55,12 @@ Sleep 500ms
 
 Enter
 
-Sleep 5s
+Sleep 3s
+
+Type "puppy monkey baby"
+
+Sleep 500ms
+
+Enter
+
+Sleep 3s
