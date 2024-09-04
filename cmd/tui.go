@@ -22,20 +22,21 @@ import (
 )
 
 type model struct {
-	prompt     string
-	image      []byte
-	err        error
-	inputMode  bool
-	cursorPos  int
-	buttonMode int // 0: none, 1: download, 2: regenerate
-	textInput  textinput.Model
-	viewport   viewport.Model
-	width      int
-	height     int
-	spinner    spinner.Model
-	generating bool
-	config     *config
-	saved      string
+	prompt       string
+	image        []byte
+	err          error
+	inputMode    bool
+	cursorPos    int
+	buttonMode   int // 0: none, 1: download, 2: regenerate
+	textInput    textinput.Model
+	viewport     viewport.Model
+	width        int
+	height       int
+	spinner      spinner.Model
+	generating   bool
+	config       *config
+	saved        string
+	regenerating bool
 }
 
 type config struct {
@@ -94,7 +95,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, tea.Quit
 				case 2:
 					log.Debug("Regenerating image", "prompt", m.prompt)
-					return m, generateImage(m.prompt, m.config)
+					m.regenerating = true
+					m.generating = true
+					m.image = nil             // Clear the existing image
+					m.viewport.SetContent("") // Clear the viewport content
+					return m, tea.Batch(generateImage(m.prompt, m.config), m.spinner.Tick)
 				}
 			}
 		case "tab":
@@ -115,6 +120,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case []byte:
 		m.image = msg
 		m.generating = false
+		m.regenerating = false
 		return m, nil
 	case error:
 		m.err = msg
@@ -144,7 +150,7 @@ func (m model) View() string {
 
 	mainView := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, rightPanel)
 
-	if m.generating && len(m.image) == 0 {
+	if m.generating && (len(m.image) == 0 || m.regenerating) {
 		return lipgloss.NewStyle().MaxWidth(m.width).MaxHeight(m.height).Render(
 			lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, m.spinnerPopup(), lipgloss.WithWhitespaceChars("  "),
 				lipgloss.WithWhitespaceForeground(lipgloss.Color("0"))),
@@ -155,7 +161,7 @@ func (m model) View() string {
 }
 
 func (m model) spinnerPopup() string {
-	if !m.generating || len(m.image) > 0 {
+	if !m.generating || (len(m.image) > 0 && !m.regenerating) {
 		return ""
 	}
 
@@ -211,7 +217,7 @@ func (m model) rightPanelView(width int) string {
 		Width(width).
 		Height(m.height)
 
-	if len(m.image) > 0 {
+	if len(m.image) > 0 && !m.regenerating {
 		cmd := m.displayImage(m.image)
 		m.viewport.SetContent(cmd)
 		return style.Render(m.viewport.View())
@@ -222,6 +228,10 @@ func (m model) rightPanelView(width int) string {
 		Align(lipgloss.Center, lipgloss.Center).
 		Width(width).
 		Height(m.height)
+
+	if m.regenerating {
+		return style.Render("") // Return an empty string to clear the panel
+	}
 
 	return placeholderStyle.Render("Image will be displayed here")
 }
