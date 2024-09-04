@@ -217,7 +217,13 @@ func (m model) rightPanelView(width int) string {
 		return style.Render(m.viewport.View())
 	}
 
-	return style.Render("Image will be displayed here")
+	placeholderStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("240")).
+		Align(lipgloss.Center, lipgloss.Center).
+		Width(width).
+		Height(m.height)
+
+	return placeholderStyle.Render("Image will be displayed here")
 }
 
 func (m model) displayImage(image []byte) string {
