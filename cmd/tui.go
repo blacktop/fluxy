@@ -8,11 +8,10 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 	"unicode"
-
-	"flag"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -21,13 +20,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 )
-
-var verbose bool
-
-func init() {
-	flag.BoolVar(&verbose, "V", false, "Enable verbose logging")
-	flag.BoolVar(&verbose, "verbose", false, "Enable verbose logging")
-}
 
 type model struct {
 	prompt     string
@@ -42,9 +34,18 @@ type model struct {
 	height     int
 	spinner    spinner.Model
 	generating bool
+	config     *config
+	saved      string
 }
 
-func initialModel() model {
+type config struct {
+	DisplayProtocol string
+	AspectRatio     string
+	OutputFormat    string
+	OutputFolder    string
+}
+
+func initialModel(c *config) model {
 	ti := textinput.New()
 	ti.Placeholder = "Enter prompt"
 	ti.Focus()
@@ -59,6 +60,7 @@ func initialModel() model {
 		viewport:   viewport.New(0, 0),
 		spinner:    s,
 		generating: false,
+		config:     c,
 	}
 }
 
@@ -83,15 +85,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.prompt = m.textInput.Value()
 				m.inputMode = false
 				m.generating = true
-				return m, tea.Batch(generateImage(m.prompt), m.spinner.Tick)
+				return m, tea.Batch(generateImage(m.prompt, m.config), m.spinner.Tick)
 			} else {
 				switch m.buttonMode {
 				case 1:
 					log.Debug("Downloading image")
-					return m, downloadImage(m.image, m.prompt)
+					m.saved, m.err = saveImage(m.image, m.prompt)
+					return m, tea.Quit
 				case 2:
 					log.Debug("Regenerating image", "prompt", m.prompt)
-					return m, generateImage(m.prompt)
+					return m, generateImage(m.prompt, m.config)
 				}
 			}
 		case "tab":
@@ -129,10 +132,6 @@ func (m model) View() string {
 		return fmt.Sprintf("Error: %v\n", m.err)
 	}
 
-	if m.generating {
-		return fmt.Sprintf("%s Generating image for prompt: %s", m.spinner.View(), m.prompt)
-	}
-
 	if m.width == 0 {
 		return "Initializing..."
 	}
@@ -143,7 +142,35 @@ func (m model) View() string {
 	leftPanel := m.leftPanelView(leftWidth)
 	rightPanel := m.rightPanelView(rightWidth)
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, rightPanel)
+	mainView := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, rightPanel)
+
+	if m.generating && len(m.image) == 0 {
+		return lipgloss.NewStyle().MaxWidth(m.width).MaxHeight(m.height).Render(
+			lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, m.spinnerPopup(), lipgloss.WithWhitespaceChars("  "),
+				lipgloss.WithWhitespaceForeground(lipgloss.Color("0"))),
+		)
+	}
+
+	return mainView
+}
+
+func (m model) spinnerPopup() string {
+	if !m.generating || len(m.image) > 0 {
+		return ""
+	}
+
+	spinnerWidth := 40
+	spinnerHeight := 3
+
+	style := lipgloss.NewStyle().
+		Width(spinnerWidth).
+		Height(spinnerHeight).
+		BorderStyle(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("205")).
+		Align(lipgloss.Center, lipgloss.Center)
+
+	content := fmt.Sprintf("%s Generating image...", m.spinner.View())
+	return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, style.Render(content))
 }
 
 func (m model) leftPanelView(width int) string {
@@ -185,12 +212,19 @@ func (m model) rightPanelView(width int) string {
 		Height(m.height)
 
 	if len(m.image) > 0 {
-		cmd := displayITermImage(m.image)
+		cmd := m.displayImage(m.image)
 		m.viewport.SetContent(cmd)
 		return style.Render(m.viewport.View())
 	}
 
 	return style.Render("Image will be displayed here")
+}
+
+func (m model) displayImage(image []byte) string {
+	if m.config.DisplayProtocol == "kitty" {
+		return displayKittyImage(image)
+	}
+	return displayITermImage(image)
 }
 
 func displayKittyImage(image []byte) string {
@@ -203,7 +237,7 @@ func displayITermImage(image []byte) string {
 	return fmt.Sprintf("\033]1337;File=inline=1;size=%d;width=auto;height=auto:%s\a\n", len(image), encoded)
 }
 
-func generateImage(prompt string) tea.Cmd {
+func generateImage(prompt string, c *config) tea.Cmd {
 	return func() tea.Msg {
 		apiKey := os.Getenv("REPLICATE_API_KEY")
 		if apiKey == "" {
@@ -212,11 +246,10 @@ func generateImage(prompt string) tea.Cmd {
 
 		payload := map[string]Input{
 			"input": {
-				Prompt:     prompt,
-				NumOutputs: 1,
-				// AspectRatio:          "1:1",
-				AspectRatio:          "16:9",
-				OutputFormat:         "webp",
+				Prompt:               prompt,
+				NumOutputs:           1,
+				AspectRatio:          c.AspectRatio,
+				OutputFormat:         c.OutputFormat,
 				OutputQuality:        100,
 				DisableSafetyChecker: true,
 			},
@@ -304,27 +337,31 @@ func generateImage(prompt string) tea.Cmd {
 	}
 }
 
-func downloadImage(image []byte, prompt string) tea.Cmd {
-	return func() tea.Msg {
-		// Sanitize the prompt for use in a filename
-		sanitizedPrompt := strings.Map(func(r rune) rune {
-			if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '-' || r == '_' {
-				return r
-			}
-			return '_'
-		}, prompt)
-
-		// Truncate the sanitized prompt if it's too long
-		if len(sanitizedPrompt) > 50 {
-			sanitizedPrompt = sanitizedPrompt[:50]
+func saveImage(image []byte, prompt string) (string, error) {
+	// Sanitize the prompt for use in a filename
+	sanitizedPrompt := strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '-' || r == '_' {
+			return r
 		}
+		return '_'
+	}, prompt)
 
-		filename := fmt.Sprintf("%s_%d.png", sanitizedPrompt, time.Now().Unix())
-		err := os.WriteFile(filename, image, 0644)
-		if err != nil {
-			return fmt.Errorf("error saving image: %w", err)
-		}
-		log.Debug("Image saved", "filename", filename)
-		return fmt.Sprintf("Image saved as %s", filename)
+	// Truncate the sanitized prompt if it's too long
+	if len(sanitizedPrompt) > 50 {
+		sanitizedPrompt = sanitizedPrompt[:50]
 	}
+
+	filename := fmt.Sprintf("%s_%d.png", sanitizedPrompt, time.Now().Unix())
+	if outputFolder != "" {
+		if err := os.MkdirAll(outputFolder, 0755); err != nil {
+			return "", fmt.Errorf("error creating output folder: %w", err)
+		}
+		filename = filepath.Join(outputFolder, filename)
+	}
+	err := os.WriteFile(filename, image, 0644)
+	if err != nil {
+		return "", fmt.Errorf("error saving image: %w", err)
+	}
+	fmt.Printf("Image saved: %s\n", filename)
+	return filename, nil
 }

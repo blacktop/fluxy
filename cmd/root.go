@@ -22,11 +22,46 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"slices"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
+)
+
+var (
+	// flags
+	logger          *log.Logger
+	verbose         bool
+	displayProtocol string
+	aspectRatio     string
+	outputFormat    string
+	outputFolder    string
+	// choices
+	validDisplayProtocols = []string{
+		"kitty",
+		"iterm",
+	}
+	validOutputFormats = []string{
+		"png",
+		"webp",
+		"jpg",
+	}
+	validAspectRatios = []string{
+		"1:1",
+		"16:9",
+		"21:9",
+		"2:3",
+		"3:2",
+		"4:5",
+		"5:4",
+		"9:16",
+		"9:21",
+	}
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -35,15 +70,40 @@ var rootCmd = &cobra.Command{
 	Short: "FLUX image generator TUI",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		verbose, _ := cmd.Flags().GetBool("verbose")
+		// flags
 		if verbose {
 			log.SetLevel(log.DebugLevel)
 		}
-
-		p := tea.NewProgram(initialModel(), tea.WithAltScreen())
-		if _, err := p.Run(); err != nil {
-			log.Error("Error running program", "error", err)
+		// validate flags
+		if !slices.Contains(validAspectRatios, aspectRatio) {
+			logger.Error(fmt.Sprintf("Invalid aspect ratio (must be one of: %s)", strings.Join(validAspectRatios, ", ")), "aspect", aspectRatio)
 			os.Exit(1)
+		}
+		if !slices.Contains(validOutputFormats, outputFormat) {
+			logger.Error(fmt.Sprintf("Invalid output format (must be one of: %s)", strings.Join(validOutputFormats, ", ")), "format", outputFormat)
+			os.Exit(1)
+		}
+		if !slices.Contains(validDisplayProtocols, displayProtocol) {
+			logger.Error(fmt.Sprintf("Invalid display protocol (must be one of: %s)", strings.Join(validDisplayProtocols, ", ")), "display", displayProtocol)
+			os.Exit(1)
+		}
+		// run
+		p := tea.NewProgram(initialModel(&config{
+			DisplayProtocol: displayProtocol,
+			AspectRatio:     aspectRatio,
+			OutputFormat:    outputFormat,
+			OutputFolder:    outputFolder,
+		}), tea.WithAltScreen())
+		m, err := p.Run()
+		if err != nil {
+			logger.Error("Error running program", "error", err)
+			os.Exit(1)
+		}
+		if m, ok := m.(model); ok {
+			if len(m.saved) > 0 {
+				println() // add space
+				logger.Infof("Saved image to %s", m.saved)
+			}
 		}
 	},
 }
@@ -58,5 +118,23 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("verbose", "V", false, "Verbose output")
+	// Override the default error level style.
+	styles := log.DefaultStyles()
+	styles.Levels[log.ErrorLevel] = lipgloss.NewStyle().
+		SetString("ERROR!!").
+		Padding(0, 1, 0, 1).
+		Background(lipgloss.Color("204")).
+		Foreground(lipgloss.Color("0"))
+	// Add a custom style for key `err`
+	styles.Keys["err"] = lipgloss.NewStyle().Foreground(lipgloss.Color("204"))
+	styles.Values["err"] = lipgloss.NewStyle().Bold(true)
+	logger = log.New(os.Stderr)
+	logger.SetStyles(styles)
+
+	rootCmd.Flags().BoolVarP(&verbose, "verbose", "V", false, "Verbose output")
+	rootCmd.Flags().StringVarP(&displayProtocol, "display", "d", "kitty", "Terminal graphics protocol to use (kitty or iterm)")
+	rootCmd.Flags().StringVarP(&aspectRatio, "aspect", "a", "1:1", "Aspect ratio of the image (example: 16:9, 4:3, 1:1)")
+	rootCmd.Flags().StringVarP(&outputFormat, "format", "f", "png", "Output image format (png, webp, or jpg)")
+	rootCmd.Flags().StringVarP(&outputFolder, "output", "o", "", "Output folder")
+	rootCmd.MarkFlagDirname("output")
 }
