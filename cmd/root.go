@@ -41,6 +41,8 @@ var (
 	aspectRatio     string
 	outputFormat    string
 	outputFolder    string
+	apiToken        string
+	fluxModel       string
 	// choices
 	validDisplayProtocols = []string{
 		"kitty",
@@ -61,6 +63,11 @@ var (
 		"5:4",
 		"9:16",
 		"9:21",
+	}
+	validFluxModels = []string{
+		"schnell",
+		"pro",
+		"dev",
 	}
 )
 
@@ -87,12 +94,18 @@ var rootCmd = &cobra.Command{
 			logger.Error(fmt.Sprintf("Invalid display protocol (must be one of: %s)", strings.Join(validDisplayProtocols, ", ")), "display", displayProtocol)
 			os.Exit(1)
 		}
+		if !slices.Contains(validFluxModels, fluxModel) {
+			logger.Error(fmt.Sprintf("Invalid flux model (must be one of: %s)", strings.Join(validFluxModels, ", ")), "model", fluxModel)
+			os.Exit(1)
+		}
 		// run
 		p := tea.NewProgram(initialModel(&config{
+			ApiToken:        apiToken,
 			DisplayProtocol: displayProtocol,
 			AspectRatio:     aspectRatio,
 			OutputFormat:    outputFormat,
 			OutputFolder:    outputFolder,
+			FluxModel:       fluxModel,
 		}), tea.WithAltScreen())
 		m, err := p.Run()
 		if err != nil {
@@ -133,8 +146,10 @@ func init() {
 
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "V", false, "Verbose output")
 	rootCmd.Flags().StringVarP(&displayProtocol, "display", "d", "kitty", "Terminal graphics protocol to use (kitty or iterm)")
-	rootCmd.Flags().StringVarP(&aspectRatio, "aspect", "a", "1:1", "Aspect ratio of the image (example: 16:9, 4:3, 1:1)")
+	rootCmd.Flags().StringVarP(&aspectRatio, "aspect", "a", "1:1", "Aspect ratio of the image (16:9, 4:3, 1:1, etc)")
 	rootCmd.Flags().StringVarP(&outputFormat, "format", "f", "png", "Output image format (png, webp, or jpg)")
+	rootCmd.Flags().StringVarP(&apiToken, "api-token", "t", "", "Replicate API token (overrides REPLICATE_API_KEY env_var)")
+	rootCmd.Flags().StringVarP(&fluxModel, "model", "m", "pro", "Model to use (schnell, pro, or dev)")
 	rootCmd.Flags().StringVarP(&outputFolder, "output", "o", "", "Output folder")
 	rootCmd.MarkFlagDirname("output")
 }

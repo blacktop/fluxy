@@ -21,6 +21,12 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+const (
+	fluxSchnellURL = "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions"
+	fluxProURL     = "https://api.replicate.com/v1/models/black-forest-labs/flux-pro/predictions"
+	fluxDevURL     = "https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions"
+)
+
 type model struct {
 	prompt       string
 	image        []byte
@@ -40,6 +46,8 @@ type model struct {
 }
 
 type config struct {
+	ApiToken        string
+	FluxModel       string
 	DisplayProtocol string
 	AspectRatio     string
 	OutputFormat    string
@@ -258,28 +266,43 @@ func displayITermImage(image []byte) string {
 
 func generateImage(prompt string, c *config) tea.Cmd {
 	return func() tea.Msg {
-		apiKey := os.Getenv("REPLICATE_API_KEY")
+		var apiKey string
+		if c.ApiToken != "" {
+			apiKey = c.ApiToken
+		} else {
+			apiKey = os.Getenv("REPLICATE_API_KEY")
+		}
 		if apiKey == "" {
-			return fmt.Errorf("REPLICATE_API_KEY environment variable not set")
+			return fmt.Errorf("replicate API token not provided. Use --api-token flag or set REPLICATE_API_KEY environment variable")
 		}
 
-		payload := map[string]Input{
-			"input": {
-				Prompt:               prompt,
-				NumOutputs:           1,
-				AspectRatio:          c.AspectRatio,
-				OutputFormat:         c.OutputFormat,
-				OutputQuality:        100,
-				DisableSafetyChecker: true,
-			},
+		input := Input{
+			Prompt:        prompt,
+			AspectRatio:   c.AspectRatio,
+			OutputFormat:  c.OutputFormat,
+			OutputQuality: 100,
 		}
 
-		jsonPayload, err := json.Marshal(payload)
+		var fluxURL string
+		switch c.FluxModel {
+		case "schnell":
+			fluxURL = fluxSchnellURL
+			input.DisableSafetyChecker = true
+		case "pro":
+			fluxURL = fluxProURL
+			input.SafetyTolerance = 5
+		case "dev":
+			fluxURL = fluxDevURL
+		default:
+			return fmt.Errorf("invalid flux model: %s", c.FluxModel)
+		}
+
+		jsonPayload, err := json.Marshal(map[string]Input{"input": input})
 		if err != nil {
 			return fmt.Errorf("error marshaling JSON: %w", err)
 		}
 
-		req, err := http.NewRequest("POST", "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions", bytes.NewBuffer(jsonPayload))
+		req, err := http.NewRequest("POST", fluxURL, bytes.NewBuffer(jsonPayload))
 		if err != nil {
 			return fmt.Errorf("error creating request: %w", err)
 		}
@@ -341,7 +364,16 @@ func generateImage(prompt string, c *config) tea.Cmd {
 		}
 
 		// Fetch the generated image
-		resp, err = http.Get(result.Output[0])
+		var outputURL string
+		if url, ok := result.Output.(string); ok {
+			outputURL = url
+		} else if urls, ok := result.Output.([]string); ok {
+			outputURL = urls[0]
+		} else {
+			return fmt.Errorf("unexpected output type: %T", result.Output)
+		}
+
+		resp, err = http.Get(outputURL)
 		if err != nil {
 			return fmt.Errorf("error fetching image: %w", err)
 		}
