@@ -1,14 +1,14 @@
 <p align="center">
-  <a href="https://github.com/blacktop/TEMPLATE"><img alt="TEMPLATE Logo" src="https://raw.githubusercontent.com/blacktop/go-template/main/docs/logo.webp" /></a>
-  <h1 align="center">go-template</h1>
-  <h4><p align="center">Go Project Template</p></h4>
+  <a href="https://github.com/blacktop/fluxy"><img alt="fluxy Logo" src="https://raw.githubusercontent.com/blacktop/fluxy/main/docs/logo.webp" /></a>
+  <h1 align="center">fluxy</h1>
+  <h4><p align="center">FLUX image generator TUI</p></h4>
   <p align="center">
-    <a href="https://github.com/blacktop/TEMPLATE/actions" alt="Actions">
-          <img src="https://github.com/blacktop/TEMPLATE/actions/workflows/go.yml/badge.svg" /></a>
-    <a href="https://github.com/blacktop/TEMPLATE/releases/latest" alt="Downloads">
-          <img src="https://img.shields.io/github/downloads/blacktop/TEMPLATE/total.svg" /></a>
-    <a href="https://github.com/blacktop/TEMPLATE/releases" alt="GitHub Release">
-          <img src="https://img.shields.io/github/release/blacktop/TEMPLATE.svg" /></a>
+    <a href="https://github.com/blacktop/fluxy/actions" alt="Actions">
+          <img src="https://github.com/blacktop/fluxy/actions/workflows/go.yml/badge.svg" /></a>
+    <a href="https://github.com/blacktop/fluxy/releases/latest" alt="Downloads">
+          <img src="https://img.shields.io/github/downloads/blacktop/fluxy/total.svg" /></a>
+    <a href="https://github.com/blacktop/fluxy/releases" alt="GitHub Release">
+          <img src="https://img.shields.io/github/release/blacktop/fluxy.svg" /></a>
     <a href="http://doge.mit-license.org" alt="LICENSE">
           <img src="https://img.shields.io/:license-mit-blue.svg" /></a>
 </p>
@@ -23,7 +23,7 @@
 ### Install
 
 ```bash
-go install github.com/blacktop/go-template@latest
+go install github.com/blacktop/fluxy@latest
 ```
 
 <!-- Fill this out -->
