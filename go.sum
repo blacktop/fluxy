@@ -2,8 +2,8 @@ github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z
 github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1/go.mod h1:uYgXzlJ7ZpABp8OJ+exZzJJhRNQ2ASbcXHWsFqH8hp8=
-github.com/blacktop/go-termimg v0.1.13 h1:cMRBSNabVRJeyYYeb/1bih3nVR2D7yyiOyCWj/iIw8g=
-github.com/blacktop/go-termimg v0.1.13/go.mod h1:Op5ZlHVhJdWF09CKsU5srJYBRkS9RIkamTDxtkSaGw4=
+github.com/blacktop/go-termimg v0.1.14 h1:bIJV/43cD7eGeUhvalfz115I23A/4QHIun+5vGhVyn4=
+github.com/blacktop/go-termimg v0.1.14/go.mod h1:EvvrvAdLQ4iiEbd6wM/DiVBAzvSJqNw3dxwFxtP932Q=
 github.com/charmbracelet/bubbles v0.19.0 h1:gKZkKXPP6GlDk6EcfujDK19PCQqRjaJZQ7QRERx1UF0=
 github.com/charmbracelet/bubbles v0.19.0/go.mod h1:WILteEqZ+krG5c3ntGEMeG99nCupcuIk7V0/zOP0tOA=
 github.com/charmbracelet/bubbletea v1.1.0 h1:FjAl9eAL3HBCHenhz/ZPjkKdScmaS5SK69JAK2YJK9c=
