@@ -19,3 +19,8 @@ work-termimg: ## Work on go-termimg package
 	@echo " > Working on go-termimg package"
 	@go work init
 	@go work use . ../go-termimg
+
+.PHONY: debug
+debug: ## Debug in another terminal
+	@echo " > Debugging"
+	@dlv debug --headless --listen=:2345 --api-version=2 main.go -- --model schnell --output test

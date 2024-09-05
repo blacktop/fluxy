@@ -27,6 +27,15 @@ const (
 	fluxDevURL     = "https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions"
 )
 
+type config struct {
+	Prompt       string
+	ApiToken     string
+	FluxModel    string
+	AspectRatio  string
+	OutputFormat string
+	OutputFolder string
+}
+
 type model struct {
 	prompt       string
 	image        *termimg.TermImg
@@ -43,15 +52,6 @@ type model struct {
 	config       *config
 	saved        string
 	regenerating bool
-}
-
-type config struct {
-	Prompt       string
-	ApiToken     string
-	FluxModel    string
-	AspectRatio  string
-	OutputFormat string
-	OutputFolder string
 }
 
 func initialModel(c *config) model {
@@ -239,7 +239,7 @@ func (m model) rightPanelView(width int) string {
 		Height(m.height)
 
 	if m.image != nil && !m.regenerating {
-		cmd, _ := m.displayImage()
+		cmd, _ := m.image.Render()
 		m.viewport.SetContent(cmd)
 		centeredContent := lipgloss.Place(width, m.height,
 			lipgloss.Center, lipgloss.Center,
@@ -258,10 +258,6 @@ func (m model) rightPanelView(width int) string {
 	}
 
 	return placeholderStyle.Render("Image will be displayed here")
-}
-
-func (m model) displayImage() (string, error) {
-	return m.image.Render()
 }
 
 func generateImage(prompt string, c *config) tea.Cmd {

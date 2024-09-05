@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to fluxy",
+            "name": "Attach to fluxy (integrated)",
             "type": "go",
             "debugAdapter": "dlv-dap",
             "request": "attach",
@@ -14,6 +14,16 @@
             "port": 2345,
             "host": "127.0.0.1",
             "preLaunchTask": "Run headless dlv" // Here !
+        },
+        {
+            "name": "Attach to fluxy (external)",
+            "type": "go",
+            "debugAdapter": "dlv-dap",
+            "request": "attach",
+            "mode": "remote",
+            "remotePath": "${workspaceFolder}",
+            "port": 2345,
+            "host": "127.0.0.1",
         }
     ]
 }
