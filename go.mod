@@ -3,7 +3,7 @@ module github.com/blacktop/fluxy
 go 1.23.0
 
 require (
-	github.com/blacktop/go-termimg v0.1.11
+	github.com/blacktop/go-termimg v0.1.13
 	github.com/charmbracelet/bubbles v0.19.0
 	github.com/charmbracelet/bubbletea v1.1.0
 	github.com/charmbracelet/lipgloss v0.13.0
