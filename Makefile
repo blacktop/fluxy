@@ -23,8 +23,8 @@ work-termimg: ## Work on go-termimg package
 .PHONY: work-clean
 work-clean: ## Clean up go work
 	@echo " > 🧼 Clean go.work"
-	@rm go.work
-	@rm go.work.sum
+	@rm go.work || true
+	@rm go.work.sum || true
 
 .PHONY: debug
 debug: ## Debug in another terminal
