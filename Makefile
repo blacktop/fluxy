@@ -20,6 +20,12 @@ work-termimg: ## Work on go-termimg package
 	@go work init
 	@go work use . ../go-termimg
 
+.PHONY: work-clean
+work-clean: ## Clean up go work
+	@echo " > 🧼 Clean go.work"
+	@rm go.work
+	@rm go.work.sum
+
 .PHONY: debug
 debug: ## Debug in another terminal
 	@echo " > Debugging"
