@@ -24,6 +24,7 @@ import (
 const (
 	fluxSchnellURL = "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions"
 	fluxProURL     = "https://api.replicate.com/v1/models/black-forest-labs/flux-pro/predictions"
+	fluxPro1_1URL  = "https://api.replicate.com/v1/models/black-forest-labs/flux-1.1-pro/predictions"
 	fluxDevURL     = "https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions"
 )
 
