@@ -45,6 +45,19 @@ archives:
       - goos: windows
         format: zip
 
+brews:
+  - repository:
+      owner: blacktop
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    goarm: "7"
+    homepage: https://github.com/blacktop/fluxy
+    description: FLUX image generator TUI
+    license: MIT
+    test: |
+      system "#{bin}/fluxy --help"
+
 changelog:
   sort: asc
   use: github
