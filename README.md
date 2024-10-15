@@ -23,6 +23,12 @@ Why leave the terminal to capture an AI image generation idea?
 ### Install
 
 ```bash
+brew install blacktop/tap/fluxy
+```
+
+Or
+
+```bash
 go install github.com/blacktop/fluxy@latest
 ```
 
