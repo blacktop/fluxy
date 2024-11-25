@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/blacktop/go-termimg v0.1.16
 	github.com/charmbracelet/bubbles v0.20.0
-	github.com/charmbracelet/bubbletea v1.2.2
+	github.com/charmbracelet/bubbletea v1.2.3
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/spf13/cobra v1.8.1
