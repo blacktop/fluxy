@@ -64,7 +64,7 @@ Flags:
 
 ![demo](vhs.gif)
 
-> [!NOTE]  
+> [!WARNING]  
 > Currently only the **Kitty** [Terminal Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/) works well. Use Ghostty 👻
 > You must use a compatible terminal to view these images.
 
