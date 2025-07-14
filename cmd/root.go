@@ -1,5 +1,5 @@
 /*
-Copyright © 2024 blacktop
+Copyright © 2024-2025 blacktop
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import (
 	"slices"
 	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
@@ -91,24 +91,22 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		// run
-		p := tea.NewProgram(initialModel(&config{
+		p := tea.NewProgram(newInitialModel(&config{
 			Prompt:       prompt,
 			ApiToken:     apiToken,
 			AspectRatio:  aspectRatio,
 			OutputFormat: outputFormat,
 			OutputFolder: outputFolder,
 			FluxModel:    fluxModel,
-		}), tea.WithAltScreen())
+		}), tea.WithAltScreen(), tea.WithMouseCellMotion())
 		m, err := p.Run()
 		if err != nil {
 			logger.Error("Error running program", "error", err)
 			os.Exit(1)
 		}
-		if m, ok := m.(model); ok {
-			if len(m.saved) > 0 {
-				println() // add space
-				logger.Infof("Saved image to %s", m.saved)
-			}
+		if m, ok := m.(newModel); ok {
+			// Note: saving is handled directly in the new TUI
+			_ = m
 		}
 	},
 }

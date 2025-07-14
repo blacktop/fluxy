@@ -65,9 +65,9 @@ Flags:
 ![demo](vhs.gif)
 
 > [!NOTE]  
-> The in terminal images leverage the **iTerm2** [Inline Images Protocol](https://iterm2.com/documentation-images.html) *OR* the **Kitty** [Terminal Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/).
+> Currently only the **Kitty** [Terminal Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/) works well. Use Ghostty 👻
 > You must use a compatible terminal to view these images.
 
 ## License
 
-MIT Copyright (c) 2024 **blacktop**
+MIT Copyright (c) 2024-2025 **blacktop**

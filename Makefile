@@ -14,6 +14,12 @@ release:
 	@echo "🚀 Releasing Version $(shell svu current)"
 	goreleaser build --id default --clean --snapshot --single-target --output dist/fluxy
 
+.PHONY: vhs
+vhs: release
+	@echo "📼 VHS Recording"
+	@echo "Please ensure you have the 'vhs' command installed."
+	vhs < vhs.tape	
+
 .PHONY: work-termimg
 work-termimg: ## Work on go-termimg package
 	@echo " > Working on go-termimg package"

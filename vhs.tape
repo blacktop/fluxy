@@ -41,15 +41,15 @@
 #   Show                            Show the subsequent commands in the output
 
 Output vhs.gif
-Output vhs.mp4
-Output vhs.webm
+# Output vhs.mp4
+# Output vhs.webm
 
 Set FontSize 22
 Set Width 1200
 Set Height 600
 Set PlaybackSpeed 2
 
-Type "fluxy"
+Type "dist/fluxy"
 
 Sleep 500ms
 
@@ -63,4 +63,4 @@ Sleep 500ms
 
 Enter
 
-Sleep 3s
+Sleep 10s
