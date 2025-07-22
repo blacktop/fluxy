@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/bubbles/v2 v2.0.0-beta.1
 	github.com/charmbracelet/bubbletea/v2 v2.0.0-beta1
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/charmbracelet/lipgloss/v2 v2.0.0-beta.1
+	github.com/charmbracelet/lipgloss/v2 v2.0.0-beta1
 	github.com/charmbracelet/log v0.4.2
 	github.com/spf13/cobra v1.9.1
 )
