@@ -8,8 +8,8 @@ github.com/blacktop/go-termimg v0.1.20 h1:+EAUc3c9hwE/fUYaqRV1BSLvAlOuLySgLTEBzx
 github.com/blacktop/go-termimg v0.1.20/go.mod h1:nwxrOjfFcBjtS358oIGBLfscSLnCpNdRlMVRxsnZwMU=
 github.com/charmbracelet/bubbles/v2 v2.0.0-beta.1 h1:swACzss0FjnyPz1enfX56GKkLiuKg5FlyVmOLIlU2kE=
 github.com/charmbracelet/bubbles/v2 v2.0.0-beta.1/go.mod h1:6HamsBKWqEC/FVHuQMHgQL+knPyvHH55HwJDHl/adMw=
-github.com/charmbracelet/bubbletea/v2 v2.0.0-beta.4 h1:UgUuKKvBwgqm2ZEL+sKv/OLeavrUb4gfHgdxe6oIOno=
-github.com/charmbracelet/bubbletea/v2 v2.0.0-beta.4/go.mod h1:0wWFRpsgF7vHsCukVZ5LAhZkiR4j875H6KEM2/tFQmA=
+github.com/charmbracelet/bubbletea/v2 v2.0.0-beta1 h1:yaxFt97mvofGY7bYZn8U/aSVoamXGE3O4AEvWhshUDI=
+github.com/charmbracelet/bubbletea/v2 v2.0.0-beta1/go.mod h1:qbcZLI5z8R49v9xBdU5V5Dh5D2uccx8wSwBqxQyErqc=
 github.com/charmbracelet/colorprofile v0.3.1 h1:k8dTHMd7fgw4bnFd7jXTLZrSU/CQrKnL3m+AxCzDz40=
 github.com/charmbracelet/colorprofile v0.3.1/go.mod h1:/GkGusxNs8VB/RSOh3fu0TJmQ4ICMMPApIIVn0KszZ0=
 github.com/charmbracelet/lipgloss v1.1.0 h1:vYXsiLHVkK7fp74RkV7b2kq9+zDLoEU4MZoFqR/noCY=
